@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<statsfeeder>
+  <numberOfThreads>10</numberOfThreads>
+    <frequency unit="second">600</frequency>
+    <feeder>true</feeder>
+    <csvOutput>true</csvOutput>
+    <receivers>
+        <receiver>
+            <name>csvOutput</name>
+            <class>com.vmware.ee.statsfeeder.CSVFileStatsReceiver</class>
+            <properties>
+                <!--  Set the file name. Files will be rolled over on the hour -->
+                <property>
+                    <name>file</name>
+                    <value>output.csv</value>
+                </property>
+            </properties>
+        </receiver>
+    </receivers>
+
+    <entityList>
+        <entities>
+            <receivers>csvOutput</receivers>
+            <container>
+                <name>vCenter</name>
+                <type>Folder</type>
+            </container>
+            <childType>HostSystem</childType>
+            <exceptions></exceptions>
+            <intervalId unit="seconds">20</intervalId>
+            <maxSamples>45</maxSamples>
+            <statsList>
+                <!-- Stats common to both VMs and Hosts -->
+                <stat>cpu.used.summation</stat>
+                <stat>cpu.usage.average</stat>
+                <stat>cpu.usagemhz.average</stat>
+                <stat>mem.usage.average</stat>
+
+                <!-- Stats specific to VMs -->
+                <stat>cpu.system.summation</stat>
+                <stat>cpu.wait.summation</stat>
+                <stat>cpu.ready.summation</stat>
+                <stat>cpu.extra.summation</stat>
+                <stat>cpu.guaranteed.latest</stat>
+                <stat>mem.swapped.average</stat>
+                <stat>mem.swaptarget.average</stat>
+                <stat>mem.vmmemctl.average</stat>
+                <stat>virtualDisk.totalWriteLatency.average</stat>
+                <stat>virtualDisk.totalReadLatency.average</stat>
+                <stat>virtualDisk.numberReadAveraged.average</stat>
+                <stat>virtualDisk.numberWriteAveraged.average</stat>
+                <stat>virtualDisk.read.average</stat>
+                <stat>virtualDisk.write.average</stat>
+
+                <!-- Stats specific to hosts -->
+                <stat>cpu.idle.summation</stat>
+                <stat>disk.usage.average</stat>
+                <stat>disk.read.average</stat>
+                <stat>disk.write.average</stat>
+                <stat>disk.commands.summation</stat>
+                <stat>disk.numberRead.summation</stat>
+                <stat>disk.numberWrite.summation</stat>
+                <stat>disk.commandsAborted.summation</stat>
+                <stat>disk.busResets.summation</stat>
+                <stat>disk.deviceReadLatency.average</stat>
+                <stat>disk.deviceWriteLatency.average</stat>
+                <stat>net.packetsRx.summation</stat>
+                <stat>net.packetsTx.summation</stat>
+                <stat>net.usage.average</stat>
+                <stat>net.received.average</stat>
+                <stat>net.transmitted.average</stat>
+            </statsList>
+        </entities>
+       <entity>
+            <receivers>csvOutput</receivers>
+            <name><%= @appliance_name %></name>
+            <type>VirtualMachine</type>
+            <intervalId unit="seconds">20</intervalId>
+            <maxSamples>45</maxSamples>
+            <statsList>
+                <!-- Stats common to both VMs and Hosts -->
+                <stat>cpu.used.summation</stat>
+                <stat>cpu.usage.average</stat>
+                <stat>mem.usage.average</stat>
+
+                <!-- Stats specific to VMs -->
+                <stat>cpu.system.summation</stat>
+                <stat>cpu.wait.summation</stat>
+                <stat>cpu.ready.summation</stat>
+                <stat>cpu.extra.summation</stat>
+                <stat>cpu.guaranteed.latest</stat>
+                <stat>mem.swapped.average</stat>
+                <stat>mem.swaptarget.average</stat>
+                <stat>mem.vmmemctl.average</stat>
+                <stat>virtualDisk.totalWriteLatency.average</stat>
+                <stat>virtualDisk.totalReadLatency.average</stat>
+                <stat>virtualDisk.numberReadAveraged.average</stat>
+                <stat>virtualDisk.numberWriteAveraged.average</stat>
+                <stat>virtualDisk.read.average</stat>
+                <stat>virtualDisk.write.average</stat>
+            </statsList>
+        </entity>
+    </entityList>
+</statsfeeder>

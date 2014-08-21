@@ -1,0 +1,56 @@
+#!/usr/bin/env python
+
+import time
+import socket
+
+graphite_host = "<%= @graphite_host %>"
+graphite_port = 2003
+
+def parse(to_parse):
+  # Split item by '#'
+  to_parse = to_parse.split('#')
+  # Parse the -number after [system]
+  item_num_index = to_parse[0].rfind('-')
+  item_num = to_parse[0][item_num_index+1:].replace('.','_')
+
+  # Convert hostname dots to underscores
+  host = to_parse[0][to_parse[0].find(']')+1:to_parse[0].rfind('[')].replace('.','_')
+
+  # Figure out if machine is a VirtualMachine or SystemHost
+  vm_or_host = to_parse[0][to_parse[0].rfind('[')+1:to_parse[0].rfind(']')]
+  if vm_or_host == 'HostSystem': vm_or_host = "ESXi"
+  else: vm_or_host = "vm"
+
+  # Split out metric value by taking the first chunk out, then keeping the rest
+  metric_main = to_parse[1].split('.')[0]
+  metric_sub = '.'.join(to_parse[1].split('.')[1:])
+
+  # Parse time, convert to epoch
+  time_start = time.strptime(to_parse[2], "%Y-%m-%dT%H:%M:%S%Z")
+  time_start_epoch = time.mktime(time_start)
+
+  # Determine number of samples received
+  num_samples = to_parse[4][to_parse[4].rfind('-')+1:]
+
+  # Store metrics in new list
+  split_values = to_parse[5].split(',')
+
+  # Counter used to increment epoch time 20s every iterations
+  counter = 0
+  for i in split_values:
+    if item_num != "":
+#      print "vmware." + vm_or_host + "." + host + "." + metric_main + "." + item_num + "." + metric_sub + "\t" + i + "\t" + str(time_start_epoch+counter) +"\n"
+      output = "vmware." + vm_or_host + "." + host + "." + metric_main + "." + item_num + "." + metric_sub + "\t" + i + "\t" + str(time_start_epoch+counter) +"\n"
+    else:
+#      print "vmware." + vm_or_host + "." + host + "." + metric_main + "." + metric_sub + "\t" + i + "\t" + str(time_start_epoch+counter) +"\n"
+      output = "vmware." + vm_or_host + "." + host + "." + metric_main + "." + metric_sub + "\t" + i + "\t" + str(time_start_epoch+counter) +"\n"
+    sock.send(output)
+    counter += 20
+
+if __name__ == "__main__":
+  sock = socket.socket()
+  sock.connect((graphite_host, graphite_port))
+  f = open('<%= @install_dir %>/output.csv', 'r')
+  for line in f:
+    parse(line.strip())
+  sock.close()
